@@ -189,13 +189,13 @@ const Filters = (() => {
     }
   }
 
-  /** Active le filtre urgence "imminent" programmatiquement. */
-  function setUrgence(value) {
-    state.urgence = new Set([value]);
-    // Mettre à jour l'UI
+  /** Active le filtre urgence programmatiquement (accepte string ou array). */
+  function setUrgence(values) {
+    const arr = Array.isArray(values) ? values : [values];
+    state.urgence = new Set(arr);
     const container = document.getElementById('filter-urgence');
     container.querySelectorAll('.toggle-btn').forEach(b => {
-      b.classList.toggle('active', b.dataset.value === value);
+      b.classList.toggle('active', arr.includes(b.dataset.value));
     });
     _onChange();
   }

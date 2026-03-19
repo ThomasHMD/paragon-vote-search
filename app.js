@@ -24,11 +24,12 @@
     SearchEngine.init(data.searchDocs);
     Filters.init(data.facets, applyAndRender);
 
-    // Banner imminent
-    if (data.meta.imminentCount > 0) {
+    // Banner imminent (compter imminent + proche pour cohérence avec le filtre)
+    const imminentCount = allCompanies.filter(c => c.urgency === 'imminent' || c.urgency === 'proche').length;
+    if (imminentCount > 0) {
       document.getElementById('imminent-banner').style.display = '';
       document.getElementById('imminent-count').textContent =
-        data.meta.imminentCount.toLocaleString('fr-FR');
+        imminentCount.toLocaleString('fr-FR');
     }
 
     loadingEl.style.display = 'none';
@@ -67,7 +68,7 @@
   document.getElementById('btn-show-imminent').addEventListener('click', () => {
     searchInput.value = '';
     Filters.resetAll();
-    Filters.setUrgence('imminent');
+    Filters.setUrgence(['imminent', 'proche']);
   });
 
   // ── Modale ──────────────────────────────────────────────────────

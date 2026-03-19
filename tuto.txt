@@ -1,0 +1,61 @@
+🔍 Paragon Vote Search — Outil de prospection élections professionnelles
+
+Salut l'équipe,
+
+Je partage un outil que j'ai monté pour la prospection : un moteur de recherche sur les 125 000 entreprises ayant organisé des élections professionnelles (données data.gouv.fr, cycle 2017-2020).
+
+L'idée : identifier rapidement les entreprises dont les mandats arrivent à échéance, pour les contacter au bon moment.
+
+👉 https://thomashmd.github.io/paragon-vote-search/
+
+
+━━━ CE QUE ÇA FAIT ━━━
+
+• Recherche full-text sur le nom, SIRET, ville
+• Filtres combinables : département, code NAF, type d'institution (CSE, CE, DP, DU — multi-sélection possible), tranche d'effectif, année d'élection, urgence, présence syndicale
+• Graphique en barres empilées : volume d'élections mois par mois sur les 12 prochains mois, cliquable pour filtrer les résultats
+• Fiche détaillée par entreprise : historique des scrutins, taux de participation, syndicats présents, nombre d'élus
+• Bouton LinkedIn sur chaque entreprise pour lancer une recherche directe
+• Panier + export CSV : sélectionner des entreprises et exporter une liste prête pour Excel
+
+
+━━━ COMMENT S'EN SERVIR ━━━
+
+1. TROUVER DES PROSPECTS
+   → Tapez un nom, une ville ou un SIRET dans la barre de recherche
+   → Ou utilisez les filtres à gauche (tout est combinable)
+   → Le graphique en haut montre la répartition des élections à venir : cliquez sur un mois pour voir uniquement les entreprises concernées
+
+2. QUALIFIER
+   → Cliquez sur une carte pour ouvrir la fiche complète
+   → Vous y trouverez : adresse, effectif, historique des scrutins, durée des mandats, syndicats présents
+   → Le bouton "in" bleu à côté du nom ouvre directement une recherche LinkedIn
+
+3. CONSTITUER UNE LISTE
+   → Cliquez sur le "+" en haut à gauche de chaque carte pour l'ajouter au panier
+   → "Sélectionner la page" ajoute les 20 résultats affichés d'un coup
+   → "Tout sélectionner" ajoute tous les résultats filtrés (attention si c'est 50 000…)
+   → La barre en bas de l'écran indique le nombre d'entreprises sélectionnées
+
+4. EXPORTER
+   → Cliquez sur "Exporter CSV" dans la barre du bas
+   → Le fichier s'ouvre dans Excel (séparateur point-virgule, encodage UTF-8)
+   → Colonnes : Nom, SIRET, Adresse, CP, Ville, Département, Code NAF, Effectif, IDCC, Prochaine élection, Urgence, Syndicats, Lien LinkedIn
+
+
+━━━ QUELQUES ASTUCES ━━━
+
+• Le bandeau rouge "Élections imminentes" en haut → cliquez "Voir les urgentes" pour afficher directement les entreprises dont l'élection tombe dans les 12 mois
+• Les filtres institution sont multi-sélection : vous pouvez cocher CSE + DP en même temps
+• Cliquer sur une barre du graphique filtre les résultats sur ce mois précis — recliquer dessus pour revenir à la vue complète
+• Tout fonctionne côté client (navigateur), rien n'est envoyé à un serveur — vos recherches restent privées
+
+
+━━━ LIMITES ━━━
+
+• Les dates de prochaines élections sont estimées par projection (date du dernier scrutin + durée du mandat) — ce ne sont pas des dates confirmées
+• Données du cycle 2017-2020, pas de mise à jour automatique
+• Certaines entreprises ont pu fusionner, fermer ou changer de structure depuis
+
+
+Si vous avez des retours ou des idées d'amélioration, je suis preneur.
