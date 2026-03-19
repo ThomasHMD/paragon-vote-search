@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PARAGON VOTE SEARCH</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/minisearch@7.1.1/dist/umd/index.min.js"></script>
+</head>
+<body>
+  <div class="scanlines"></div>
+
+  <div class="container">
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header__corner header__corner--tl"></div>
+      <div class="header__corner header__corner--tr"></div>
+      <div class="header__corner header__corner--bl"></div>
+      <div class="header__corner header__corner--br"></div>
+      <h1 class="header__title">
+        <span class="header__stars">★ ★ ★ ★ ★ ★ ★ ★ ★</span>
+        <span class="header__main">PARAGON <span class="header__main-highlight">VOTE</span> SEARCH</span>
+        <span class="header__subtitle">/// Élections pro — Prospection ///</span>
+      </h1>
+      <p class="header__disclaimer">Dates estimées par projection des mandats · data.gouv.fr · cycle 2017-2020</p>
+    </header>
+
+    <!-- IMMINENT BANNER -->
+    <div class="imminent-banner" id="imminent-banner" style="display:none">
+      <span class="imminent-banner__text">
+        ⚡ Élections imminentes (12 mois) :
+        <span class="imminent-banner__count" id="imminent-count">0</span>
+        entreprises
+      </span>
+      <button class="imminent-banner__btn" id="btn-show-imminent">Voir les urgentes →</button>
+    </div>
+
+    <!-- CHART -->
+    <div class="chart" id="chart-wrapper">
+      <div class="chart__title">★ ÉLECTIONS — 12 PROCHAINS MOIS</div>
+      <div class="chart__content" id="chart-container"></div>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="search-bar">
+      <span class="search-bar__icon">🔍</span>
+      <input type="text" class="search-bar__input" id="search-input"
+             placeholder="Rechercher une entreprise, SIRET, ville...">
+    </div>
+
+    <!-- LAYOUT -->
+    <div class="layout">
+      <!-- FILTERS -->
+      <aside class="filters" id="filters-panel">
+        <div class="filters__title">★ FILTRES</div>
+        <div class="filters__body">
+          <div class="filter-group">
+            <label class="filter-group__label">Département</label>
+            <select id="filter-dep"><option value="">Tous les départements</option></select>
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-group__label">Code NAF</label>
+            <select id="filter-naf"><option value="">Tous les secteurs</option></select>
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-group__label">Institution</label>
+            <div class="toggle-group" id="filter-institution"></div>
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-group__label">Effectif</label>
+            <div class="toggle-group" id="filter-effectif"></div>
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-group__label">Année élection</label>
+            <div class="filter-group__row">
+              <select id="filter-annee-min"><option value="">Min</option></select>
+              <span class="filter-group__row-sep">→</span>
+              <select id="filter-annee-max"><option value="">Max</option></select>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-group__label">Urgence</label>
+            <div class="toggle-group" id="filter-urgence"></div>
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-group__label">Présence syndicale</label>
+            <div class="toggle-group" id="filter-syndicats"></div>
+          </div>
+
+          <button class="filters__reset" id="btn-reset-filters">✕ Réinitialiser les filtres</button>
+        </div>
+      </aside>
+
+      <!-- RESULTS -->
+      <main class="results">
+        <div class="results__header">
+          <div class="results__count" id="results-count"></div>
+          <select class="results__sort" id="sort-select">
+            <option value="nextElection">Prochaine élection ↑</option>
+            <option value="effectif">Effectif ↓</option>
+            <option value="nom">Nom A-Z</option>
+          </select>
+        </div>
+
+        <!-- Loading state -->
+        <div class="loading" id="loading">
+          <div class="loading__spinner">CHARGEMENT DES DONNÉES...</div>
+          <div class="loading__bar">
+            <div class="loading__bar-fill" id="loading-bar" style="width:0%"></div>
+          </div>
+        </div>
+
+        <!-- Selection actions bar -->
+        <div class="selection-bar" id="selection-bar">
+          <button class="selection-bar__btn" id="btn-select-page">☐ Sélectionner la page</button>
+          <button class="selection-bar__btn" id="btn-select-all">☐ Tout sélectionner (<span id="select-all-count">0</span>)</button>
+          <button class="selection-bar__btn selection-bar__btn--clear" id="btn-clear-selection">✕ Vider</button>
+          <span class="selection-bar__counter" id="selection-counter">0 sélectionnées</span>
+        </div>
+
+        <!-- Results grid -->
+        <div class="results__grid" id="results-grid"></div>
+
+        <!-- Empty state -->
+        <div class="empty-state" id="empty-state" style="display:none">
+          <div class="empty-state__icon">📭</div>
+          <div class="empty-state__text">AUCUN RÉSULTAT</div>
+          <div class="empty-state__hint">Essayez d'élargir vos critères de recherche</div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination"></div>
+      </main>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <p>Données : data.gouv.fr — Élections professionnelles (cycle 2017-2020)</p>
+      <p class="footer__credits">★ PARAGON VOTE SEARCH ★</p>
+    </footer>
+  </div>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" id="modal">
+      <button class="modal__close" id="modal-close">✕</button>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <!-- Floating cart bar -->
+  <div class="cart-bar" id="cart-bar" style="display:none">
+    <span class="cart-bar__text" id="cart-bar-text">0 entreprises sélectionnées</span>
+    <button class="cart-bar__btn cart-bar__btn--export" id="btn-export-csv">Exporter CSV →</button>
+    <button class="cart-bar__btn cart-bar__btn--clear" id="btn-cart-clear">Vider</button>
+  </div>
+
+  <script src="js/data-loader.js?v=2"></script>
+  <script src="js/search.js?v=2"></script>
+  <script src="js/filters.js?v=2"></script>
+  <script src="js/cart.js?v=2"></script>
+  <script src="js/chart.js?v=2"></script>
+  <script src="js/render.js?v=2"></script>
+  <script src="app.js?v=2"></script>
+</body>
+</html>
