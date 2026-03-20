@@ -210,7 +210,11 @@ const Filters = (() => {
   }
 
   function apply(companies) {
+    const today = new Date().toISOString().slice(0, 10);
     return companies.filter(c => {
+      // Masquer les élections passées par défaut (ne garder que les élections du jour et futures)
+      if (c.nextElection && c.nextElection < today) return false;
+
       if (state.dep && c.dep !== state.dep) return false;
 
       if (state.naf && !c.naf.startsWith(state.naf)) return false;
