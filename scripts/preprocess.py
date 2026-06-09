@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Pipeline de prétraitement des données élections professionnelles.
-Lit les fichiers Excel source (data.gouv.fr, cycle 2017-2020) et produit
+Lit les fichiers Excel source (data.gouv.fr, cycle 2021-2024) et produit
 des JSON optimisés pour le frontend Paragon Vote Search.
 """
 import json
@@ -20,6 +20,22 @@ DATA_DIR.mkdir(exist_ok=True)
 CHUNK_SIZE = 5000
 TODAY = date.today()
 
+# ── Configuration des sources ───────────────────────────────────────────
+# Cycle de données courant. Les fichiers bruts data.gouv.fr sont dans NewData/.
+# Pour régénérer à partir d'un autre cycle : repointer SOURCE_DIR / SRC_* et CYCLE.
+CYCLE = "2021-2024"
+SOURCE_DIR = BASE_DIR / "NewData"
+SRC_TOUR1     = SOURCE_DIR / "20260327-2-tour-1-avec-et-sans-ano-bloq.xlsx"
+SRC_TOUR2     = SOURCE_DIR / "20260327-3-tour-2-avec-et-sans-ano-bloq.xlsx"
+SRC_SYNDICATS = SOURCE_DIR / "20260327-4-syndicats-confederations.xlsx"
+SRC_SIRET     = SOURCE_DIR / "20260327-5-fichier-siret-t1-1.xlsx"
+
+# Colonnes numériques à coercer : le cycle 2021-2024 stocke certains nombres
+# en texte (et des cellules vides ''). pd.to_numeric(errors="coerce") garantit
+# des sommes/max corrects (sinon risque de concaténation ou de crash int('')).
+NUMERIC_COLS = ["effectif", "numinscrits", "numvotants", "numsuffragesvalab",
+                "numsieges", "nbelus", "dureemandat", "codsyndicat"]
+
 # ── Helpers ──────────────────────────────────────────────────────────────
 
 def parse_date_int(d):
@@ -31,6 +47,14 @@ def parse_date_int(d):
         return date(int(s[:4]), int(s[4:6]), int(s[6:8]))
     except (ValueError, IndexError):
         return None
+
+
+def norm_siret(x):
+    """Normalise un SIRET en 14 chiffres. None si vide/invalide."""
+    if pd.isna(x):
+        return None
+    digits = "".join(ch for ch in str(x).split(".")[0] if ch.isdigit())
+    return digits.zfill(14) if digits else None
 
 
 def project_next_election(scrutin_date, duree_mandat, unite="A"):
@@ -89,17 +113,20 @@ def load_tours():
     ]
 
     print("Lecture Tour 1...")
-    t1 = pd.read_excel(BASE_DIR / "2-tour-1-avec-et-sans-ano-bloq.xlsx",
-                        usecols=lambda c: c in cols_needed)
+    t1 = pd.read_excel(SRC_TOUR1, usecols=lambda c: c in cols_needed)
     print(f"  → {len(t1)} lignes")
 
     print("Lecture Tour 2...")
-    t2 = pd.read_excel(BASE_DIR / "3-tour-2-avec-et-sans-ano-bloq.xlsx",
-                        usecols=lambda c: c in cols_needed)
+    t2 = pd.read_excel(SRC_TOUR2, usecols=lambda c: c in cols_needed)
     print(f"  → {len(t2)} lignes")
 
     df = pd.concat([t1, t2], ignore_index=True)
     print(f"Total brut : {len(df)} lignes")
+
+    # Coercition numérique défensive (cycle 2021-2024 = nombres parfois en texte)
+    for col in NUMERIC_COLS:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
 
     # Filtre statut validé
     df = df[df["statut"] == "VAL"].copy()
@@ -110,13 +137,16 @@ def load_tours():
 
 def load_syndicats():
     """Charge la table de référence syndicats → confédérations."""
-    syn = pd.read_excel(BASE_DIR / "4-syndicats-confederations.xlsx")
+    syn = pd.read_excel(SRC_SYNDICATS)
+    syn["codsyndicat"] = pd.to_numeric(syn["codsyndicat"], errors="coerce")
+    syn = syn.dropna(subset=["codsyndicat"])
     return dict(zip(syn["codsyndicat"].astype(int), syn["libconfederation"].fillna("")))
 
 
 def load_siret_associes():
-    """Charge les SIRET associés par elenum."""
-    si = pd.read_excel(BASE_DIR / "5-fichier-siret-t1-1.xlsx")
+    """Charge les SIRET associés par elenum. (Non utilisé actuellement par
+    l'agrégation — conservé pour une future fiche « établissements liés ».)"""
+    si = pd.read_excel(SRC_SIRET)
     si["siretassocie"] = si["siretassocie"].apply(lambda x: str(int(x)).zfill(14) if pd.notna(x) else None)
     return si.groupby("elenum")["siretassocie"].apply(list).to_dict()
 
@@ -126,7 +156,7 @@ def load_siret_associes():
 def aggregate(df, syndicat_map):
     """Agrège les lignes par SIRET → une fiche entreprise."""
     # Normaliser SIRET
-    df["siret"] = df["siret"].apply(lambda x: str(int(x)).zfill(14) if pd.notna(x) else None)
+    df["siret"] = df["siret"].apply(norm_siret)
     df = df.dropna(subset=["siret"])
     df["date_parsed"] = df["datescrutin"].apply(parse_date_int)
 
@@ -139,8 +169,8 @@ def aggregate(df, syndicat_map):
         if dep == "97" and len(cp) >= 3:
             dep = cp[:3]  # DOM-TOM
 
-        # Effectif max trouvé
-        effectif = int(group["effectif"].max()) if group["effectif"].notna().any() else 0
+        # Effectif réel (absent du cycle 2021-2024 → proxy calculé plus bas)
+        effectif_reel = int(group["effectif"].max()) if group["effectif"].notna().any() else 0
 
         # Élections par institution
         elections = []
@@ -188,6 +218,15 @@ def aggregate(df, syndicat_map):
         if not elections:
             continue
 
+        # Effectif : réel si publié, sinon estimé par le max d'inscrits.
+        # Le cycle 2021-2024 ne publie plus la colonne effectif (100 % vide) ;
+        # on retombe sur le nb d'inscrits (≈ électeurs ≈ salariés) comme proxy.
+        inscrits_max = max((e["inscrits"] for e in elections), default=0)
+        if effectif_reel > 0:
+            effectif, eff_estime = effectif_reel, False
+        else:
+            effectif, eff_estime = inscrits_max, inscrits_max > 0
+
         # Prochaine élection globale
         next_dates = [e["next"] for e in elections if e["next"]]
         next_election = min(next_dates) if next_dates else None
@@ -210,6 +249,7 @@ def aggregate(df, syndicat_map):
             "dep": dep,
             "naf": naf,
             "effectif": effectif,
+            "effEstime": eff_estime,
             "idcc": idcc,
             "elections": elections,
             "syndicats": sorted(all_syndicats),
@@ -319,14 +359,18 @@ def write_output(companies, facets):
     )
 
     # Meta
+    eff_estime_count = sum(1 for c in companies if c.get("effEstime"))
     meta = {
         "totalCompanies": len(companies),
         "totalChunks": nb_chunks,
         "chunkSize": CHUNK_SIZE,
         "generatedAt": datetime.now().isoformat(),
-        "dataSource": "data.gouv.fr — Élections professionnelles (cycle 2017-2020)",
+        "dataSource": f"data.gouv.fr — Élections professionnelles (cycle {CYCLE})",
+        "cycle": CYCLE,
         "imminentCount": imminent_count,
-        "imminentHorizonMonths": 12
+        "imminentHorizonMonths": 12,
+        "effectifProxy": "numinscrits",
+        "effectifEstimeCount": eff_estime_count
     }
     with open(DATA_DIR / "meta.json", "w", encoding="utf-8") as f:
         json.dump(meta, f, ensure_ascii=False, indent=2)
@@ -356,25 +400,23 @@ def main():
     print("PARAGON VOTE SEARCH — Pipeline de données")
     print("=" * 60)
 
-    print("\n[1/5] Chargement des tours...")
+    print(f"\nCycle : {CYCLE}  |  sources : {SOURCE_DIR}")
+
+    print("\n[1/3] Chargement des tours...")
     df = load_tours()
 
-    print("\n[2/5] Chargement table syndicats...")
+    print("\n[2/3] Chargement table syndicats...")
     syndicat_map = load_syndicats()
     print(f"  → {len(syndicat_map)} syndicats")
 
-    print("\n[3/5] Chargement SIRET associés...")
-    siret_map = load_siret_associes()
-    print(f"  → {len(siret_map)} PV avec SIRET associés")
-
-    print("\n[4/5] Agrégation par entreprise...")
+    print("\n[3/3] Agrégation par entreprise...")
     companies = aggregate(df, syndicat_map)
     print(f"  → {len(companies)} entreprises uniques")
 
     # Trier par prochaine élection (les plus proches d'abord)
     companies.sort(key=lambda c: c["nextElection"] or "9999-99-99")
 
-    print("\n[5/5] Écriture des fichiers JSON...")
+    print("\nÉcriture des fichiers JSON...")
     facets = build_facets(companies)
     write_output(companies, facets)
 

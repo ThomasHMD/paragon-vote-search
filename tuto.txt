@@ -2,7 +2,7 @@
 
 Salut l'équipe,
 
-Je partage un outil que j'ai monté pour la prospection : un moteur de recherche sur les 125 000 entreprises ayant organisé des élections professionnelles (données data.gouv.fr, cycle 2017-2020).
+Je partage un outil que j'ai monté pour la prospection : un moteur de recherche sur les ~124 000 entreprises ayant organisé des élections professionnelles (données data.gouv.fr, cycle 2021-2024, le plus récent et le plus fiable).
 
 L'idée : identifier rapidement les entreprises dont les mandats arrivent à échéance, pour les contacter au bon moment.
 
@@ -54,7 +54,8 @@ L'idée : identifier rapidement les entreprises dont les mandats arrivent à éc
 ━━━ LIMITES ━━━
 
 • Les dates de prochaines élections sont estimées par projection (date du dernier scrutin + durée du mandat) — ce ne sont pas des dates confirmées
-• Données du cycle 2017-2020, pas de mise à jour automatique
+• Données du cycle 2021-2024, pas de mise à jour automatique
+• L'effectif n'est plus publié sur ce cycle : la taille affichée (~ X inscrits) est estimée d'après le nombre d'électeurs inscrits
 • Certaines entreprises ont pu fusionner, fermer ou changer de structure depuis
 
 

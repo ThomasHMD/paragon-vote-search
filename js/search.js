@@ -16,7 +16,10 @@ const SearchEngine = (() => {
       searchOptions: {
         boost: { nom: 3, siret: 2, ville: 1.5, cp: 1 },
         fuzzy: 0.2,
-        prefix: true
+        prefix: true,
+        // AND : une requête multi-mots doit matcher TOUS les termes.
+        // Sinon "Naval Group" remonte les 2000+ entreprises contenant "groupe".
+        combineWith: 'AND'
       }
     });
     miniSearch.addAll(searchDocs);

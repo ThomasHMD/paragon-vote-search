@@ -37,7 +37,8 @@ const Render = (() => {
   }
 
   function buildLinkedInUrl(nom) {
-    return `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(nom)}&origin=SWITCH_SEARCH_VERTICAL`;
+    // "DRH" ajouté systématiquement pour cibler directement les RH (demande Eric, 09/06/2026).
+    return `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(nom + ' DRH')}&origin=SWITCH_SEARCH_VERTICAL`;
   }
 
   function renderCard(company) {
@@ -69,7 +70,7 @@ const Render = (() => {
         </div>
         <div class="card__info">
           <span>📍 ${escapeHtml(c.ville)} (${c.dep})</span>
-          <span>👥 ${c.effectif.toLocaleString('fr-FR')} sal.</span>
+          <span title="${c.effEstime ? 'Effectif estimé d’après le nombre d’inscrits (non publié sur le cycle 2021-2024)' : ''}">👥 ${c.effEstime ? '~' : ''}${c.effectif.toLocaleString('fr-FR')} ${c.effEstime ? 'inscrits' : 'sal.'}</span>
           <span>🏢 NAF ${c.naf}</span>
         </div>
         <div class="card__election">
@@ -220,8 +221,8 @@ const Render = (() => {
               <div class="modal__field-value">${c.dep}</div>
             </div>
             <div class="modal__field">
-              <div class="modal__field-label">Effectif</div>
-              <div class="modal__field-value">${c.effectif.toLocaleString('fr-FR')} salarié${c.effectif > 1 ? 's' : ''}</div>
+              <div class="modal__field-label">${c.effEstime ? 'Effectif estimé' : 'Effectif'}</div>
+              <div class="modal__field-value" title="${c.effEstime ? 'Estimé d’après le nombre d’inscrits — l’effectif n’est plus publié sur le cycle 2021-2024' : ''}">${c.effEstime ? '~' : ''}${c.effectif.toLocaleString('fr-FR')} ${c.effEstime ? 'inscrits' : 'salarié' + (c.effectif > 1 ? 's' : '')}</div>
             </div>
           </div>
         </div>

@@ -1,9 +1,12 @@
 {
-  "totalCompanies": 125191,
-  "totalChunks": 26,
+  "totalCompanies": 124396,
+  "totalChunks": 25,
   "chunkSize": 5000,
-  "generatedAt": "2026-03-19T11:33:25.647441",
-  "dataSource": "data.gouv.fr — Élections professionnelles (cycle 2017-2020)",
-  "imminentCount": 28300,
-  "imminentHorizonMonths": 12
+  "generatedAt": "2026-06-09T14:24:20.187015",
+  "dataSource": "data.gouv.fr — Élections professionnelles (cycle 2021-2024)",
+  "cycle": "2021-2024",
+  "imminentCount": 35780,
+  "imminentHorizonMonths": 12,
+  "effectifProxy": "numinscrits",
+  "effectifEstimeCount": 122084
 }

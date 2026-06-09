@@ -108,7 +108,8 @@
   });
 
   function buildLinkedInUrl(nom) {
-    return `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(nom)}&origin=SWITCH_SEARCH_VERTICAL`;
+    // "DRH" ajouté systématiquement pour cibler directement les RH (demande Eric, 09/06/2026).
+    return `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(nom + ' DRH')}&origin=SWITCH_SEARCH_VERTICAL`;
   }
 
   function exportCSV() {

@@ -92,6 +92,13 @@ const Filters = (() => {
     // Institution
     buildToggleGroup('filter-institution', facets.institutions, 'institution', onChange);
 
+    // Masquer le groupe Institution s'il n'y a qu'un seul type (cycle 2021-2024 = 100 % CSE).
+    // Data-driven : le filtre réapparaît automatiquement si un futur cycle remixe CE/DP/DU.
+    if (Object.keys(facets.institutions || {}).length <= 1) {
+      const grp = document.getElementById('filter-institution').closest('.filter-group');
+      if (grp) grp.style.display = 'none';
+    }
+
     // Effectif
     buildToggleGroup('filter-effectif', facets.effectifs, 'effectif', onChange);
 
