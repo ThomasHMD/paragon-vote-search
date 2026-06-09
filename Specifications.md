@@ -256,9 +256,9 @@ La méthode `Filters.apply(companies)` évalue tous les filtres actifs en **AND 
 
 ### Lien LinkedIn
 
-Le terme **« DRH » est ajouté systématiquement** aux mots-clés pour cibler directement les RH (demande Eric Demasi, 09/06/2026) :
+Le terme **« Relations sociales » est ajouté systématiquement** aux mots-clés pour cibler les interlocuteurs RH/relations sociales (09/06/2026) :
 ```
-https://www.linkedin.com/search/results/people/?keywords={NOM + " DRH" URL_ENCODED}&origin=SWITCH_SEARCH_VERTICAL
+https://www.linkedin.com/search/results/people/?keywords={NOM + " Relations sociales" URL_ENCODED}&origin=SWITCH_SEARCH_VERTICAL
 ```
 
 Présent sur chaque card (bouton `in` bleu) et dans la modale (bouton texte dans le header).
@@ -309,7 +309,7 @@ Pour brancher un nouveau cycle : déposer les fichiers data.gouv dans `NewData/`
 ## 5. Maintenance et Évolutions futures
 
 ### Changelog
-- **2026-06-09 — Migration cycle 2021-2024.** Données data.gouv.fr 2021-2024 (publiées mai 2026, plus fiables que 2017-2020). 124 396 entreprises (vs 125 191). Changements de fond du jeu source : effectif non publié (→ proxy inscrits), 100 % CSE. Côté code : `preprocess.py` repointé sur `NewData/` + coercition numérique défensive + proxy effectif ; LinkedIn « DRH » systématique ; recherche multi-mots passée en **AND** (sinon « Naval Group » noyait 2000+ « groupe ») ; labels cycle ; bump cache `?v=3`. Validé bout-en-bout (Playwright) — recoupe la vérité terrain Eric (Naval Group = 9 sites, octobre 2026). Sauvegarde de l'app pré-migration dans `sauvegarde/2026-06-09-pre-maj-2021-2024/`.
+- **2026-06-09 — Migration cycle 2021-2024.** Données data.gouv.fr 2021-2024 (publiées mai 2026, plus fiables que 2017-2020). 124 396 entreprises (vs 125 191). Changements de fond du jeu source : effectif non publié (→ proxy inscrits), 100 % CSE. Côté code : `preprocess.py` repointé sur `NewData/` + coercition numérique défensive + proxy effectif ; LinkedIn « Relations sociales » systématique (initialement « DRH ») ; recherche multi-mots passée en **AND** (sinon « Naval Group » noyait 2000+ « groupe ») ; labels cycle ; bump cache `?v=4`. Validé bout-en-bout (Playwright) — recoupe la vérité terrain Eric (Naval Group = 9 sites, octobre 2026). Sauvegarde de l'app pré-migration dans `sauvegarde/2026-06-09-pre-maj-2021-2024/`.
 
 ### Pistes futures
 - Fiche « établissements liés » via `5-fichier-siret-t1-1.xlsx` (`load_siret_associes()` déjà prêt, non branché).

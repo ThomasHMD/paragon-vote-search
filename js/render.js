@@ -37,8 +37,8 @@ const Render = (() => {
   }
 
   function buildLinkedInUrl(nom) {
-    // "DRH" ajouté systématiquement pour cibler directement les RH (demande Eric, 09/06/2026).
-    return `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(nom + ' DRH')}&origin=SWITCH_SEARCH_VERTICAL`;
+    // "Relations sociales" ajouté systématiquement aux mots-clés (09/06/2026).
+    return `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(nom + ' Relations sociales')}&origin=SWITCH_SEARCH_VERTICAL`;
   }
 
   function renderCard(company) {
