@@ -268,7 +268,8 @@ def build_facets(companies):
     nafs = {}
     institutions = {}
     annees = {}
-    effectif_ranges = {"1-49": 0, "50-99": 0, "100-299": 0, "300-999": 0, "1000+": 0}
+    effectif_ranges = {"Moins de 50": 0, "50 à 99": 0, "100 à 249": 0,
+                       "250 à 499": 0, "500 à 999": 0, "+ de 1000": 0}
     urgencies = {}
     has_syndicat = {"oui": 0, "non": 0}
 
@@ -291,18 +292,20 @@ def build_facets(companies):
                 y = e["next"][:4]
                 annees[y] = annees.get(y, 0) + 1
 
-        # Effectif
+        # Effectif (paliers demandés par Jean-Yves Kernaul, 09/06/2026)
         eff = c["effectif"]
         if eff < 50:
-            effectif_ranges["1-49"] += 1
+            effectif_ranges["Moins de 50"] += 1
         elif eff < 100:
-            effectif_ranges["50-99"] += 1
-        elif eff < 300:
-            effectif_ranges["100-299"] += 1
+            effectif_ranges["50 à 99"] += 1
+        elif eff < 250:
+            effectif_ranges["100 à 249"] += 1
+        elif eff < 500:
+            effectif_ranges["250 à 499"] += 1
         elif eff < 1000:
-            effectif_ranges["300-999"] += 1
+            effectif_ranges["500 à 999"] += 1
         else:
-            effectif_ranges["1000+"] += 1
+            effectif_ranges["+ de 1000"] += 1
 
         # Urgence
         u = c["urgency"]

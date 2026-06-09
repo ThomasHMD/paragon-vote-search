@@ -312,6 +312,8 @@ Pour brancher un nouveau cycle : déposer les fichiers data.gouv dans `NewData/`
 ### Changelog
 - **2026-06-09 — Migration cycle 2021-2024.** Données data.gouv.fr 2021-2024 (publiées mai 2026, plus fiables que 2017-2020). 124 396 entreprises (vs 125 191). Changements de fond du jeu source : effectif non publié (→ proxy inscrits), 100 % CSE. Côté code : `preprocess.py` repointé sur `NewData/` + coercition numérique défensive + proxy effectif ; LinkedIn « Relations sociales » systématique (initialement « DRH ») ; recherche multi-mots passée en **AND** (sinon « Naval Group » noyait 2000+ « groupe ») ; labels cycle ; bump cache `?v=4`. Validé bout-en-bout (Playwright) — recoupe la vérité terrain Eric (Naval Group = 9 sites, octobre 2026). Sauvegarde de l'app pré-migration dans `sauvegarde/2026-06-09-pre-maj-2021-2024/`.
 
+- **2026-06-09 (suite) — Retours Jean-Yves Kernaul.** Paliers effectif rebornés (Moins de 50 / 50 à 99 / 100 à 249 / 250 à 499 / 500 à 999 / + de 1000). Fix décalage timezone du chart : `new Date(y,m,1).toISOString()` repassait la veille en UTC+, donc « Août » démarrait au 31/07 — désormais ISO construit depuis les composants locaux. LinkedIn « Relations sociales » entre guillemets (phrase exacte). Cache `?v=6`.
+
 ### Pistes futures
 - Fiche « établissements liés » via `5-fichier-siret-t1-1.xlsx` (`load_siret_associes()` déjà prêt, non branché).
 - Mise à jour semi-automatique quand un nouveau cycle paraît sur data.gouv.fr.

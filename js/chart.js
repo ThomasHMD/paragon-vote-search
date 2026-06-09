@@ -36,8 +36,11 @@ const Chart = (() => {
       end.setMonth(end.getMonth() + i + 1);
 
       const label = `${monthNames[m.getMonth()]} ${String(m.getFullYear()).slice(2)}`;
-      const startISO = m.toISOString().slice(0, 10);
-      const endISO = end.toISOString().slice(0, 10);
+      // ISO depuis les composants LOCAUX (pas toISOString : décale d'1 j en UTC+,
+      // ex. bin "Août" démarrait au 31/07 pour un utilisateur en France).
+      const pad = n => String(n).padStart(2, '0');
+      const startISO = `${m.getFullYear()}-${pad(m.getMonth() + 1)}-01`;
+      const endISO = `${end.getFullYear()}-${pad(end.getMonth() + 1)}-01`;
 
       bins.push({ label, start: startISO, end: endISO });
     }
