@@ -108,8 +108,8 @@
   });
 
   function buildLinkedInUrl(nom) {
-    // "Relations sociales" ajouté systématiquement aux mots-clés (09/06/2026).
-    return `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(nom + ' Relations sociales')}&origin=SWITCH_SEARCH_VERTICAL`;
+    // Phrase exacte "Relations sociales" (guillemets) ajoutée aux mots-clés (09/06/2026).
+    return `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(nom + ' "Relations sociales"')}&origin=SWITCH_SEARCH_VERTICAL`;
   }
 
   function exportCSV() {

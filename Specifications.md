@@ -258,7 +258,8 @@ La méthode `Filters.apply(companies)` évalue tous les filtres actifs en **AND 
 
 Le terme **« Relations sociales » est ajouté systématiquement** aux mots-clés pour cibler les interlocuteurs RH/relations sociales (09/06/2026) :
 ```
-https://www.linkedin.com/search/results/people/?keywords={NOM + " Relations sociales" URL_ENCODED}&origin=SWITCH_SEARCH_VERTICAL
+https://www.linkedin.com/search/results/people/?keywords={NOM + ' "Relations sociales"' URL_ENCODED}&origin=SWITCH_SEARCH_VERTICAL
+(guillemets autour de la phrase = recherche exacte côté LinkedIn ; le nom reste en mots-clés larges)
 ```
 
 Présent sur chaque card (bouton `in` bleu) et dans la modale (bouton texte dans le header).
